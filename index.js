@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField,  } = require("discord.js");
+const { Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField,ActionRowBuilder, ButtonBuilder, ButtonStyle  } = require("discord.js");
 
 class EzDiscord {
     constructor(token) {
@@ -155,6 +155,36 @@ async inviteBy(member) {
         });
     }
 
+    deleteChannel(channelId, timeout = 0) {
+        return new Promise((resolve, reject) => {
+            const channel = this.client.channels.cache.get(channelId);
+            if (!channel) return reject("channel not found");
+            setTimeout(async () => {
+                try {
+                    await channel.delete();
+                    resolve();
+                } catch (err) {
+                    reject(err);
+                }
+            }, timeout);
+        });
+    }
+
+    editChannelPermissions(channelId, permissions, timeout = 0) {
+        return new Promise((resolve, reject) => {
+            const channel = this.client.channels.cache.get(channelId);
+            if (!channel) return reject("channel not found");
+            setTimeout(async () => {
+                try {
+                    await channel.edit({ permissionOverwrites: permissions });
+                    resolve();
+                } catch (err) {
+                    reject(err);
+                }
+            }, timeout);
+        });
+    }
+
     edit(messageData, newText, timeout = 0) {
         return new Promise((resolve, reject) => {
             let messageToEdit = messageData?.botMessage || messageData;
@@ -215,6 +245,104 @@ async inviteBy(member) {
             }
         });
     }
+
+    createButton(label, customId, style = "Primary", emoji = null, disabled = false) {
+        const button = new ButtonBuilder()
+            .setLabel(label)
+            .setCustomId(customId)
+            .setStyle(ButtonStyle[style])
+            .setDisabled(disabled);
+        
+        if (emoji) button.setEmoji(emoji);
+        return button;
+    }
+    
+    
+    createLinkButton(label, url, emoji = null, disabled = false) {
+        const button = new ButtonBuilder()
+            .setLabel(label)
+            .setURL(url)
+            .setStyle(ButtonStyle.Link)
+            .setDisabled(disabled);
+        
+        if (emoji) button.setEmoji(emoji);
+        return button;
+    }
+    
+    
+    createButtonRow(buttons = []) {
+        const row = new ActionRowBuilder();
+        buttons.forEach(button => row.addComponents(button));
+        return row;
+    }
+    
+    
+    async sendButton(channelId, text, buttons = [], embed = null) {
+        try {
+            const channel = await this.client.channels.fetch(channelId);
+            if (!channel) throw new Error("Channel not found");
+            
+            const messageData = { content: text, components: buttons };
+            if (embed) messageData.embeds = [embed];
+            
+            const sent = await channel.send(messageData);
+            return sent;
+        } catch (err) {
+            throw err;
+        }
+    }
+    
+    
+    async replyWithButtons(message, text, buttons = [], embed = null) {
+        try {
+            const messageData = { content: text, components: buttons };
+            if (embed) messageData.embeds = [embed];
+            
+            const sent = await message.reply(messageData);
+            return sent;
+        } catch (err) {
+            throw err;
+        }
+    } 
+
+    createEmbed(embedOptions) {
+        return embedOptions; 
+    }
+    
+    
+    async sendEmbedWithButtons(channelId, embedOptions, buttons = [], text = "") {
+        try {
+            const channel = await this.client.channels.fetch(channelId);
+            if (!channel) throw new Error("Channel not found");
+    
+            const messageData = { content: text, embeds: [embedOptions] };
+            if (buttons.length) messageData.components = buttons;
+    
+            const sent = await channel.send(messageData);
+            return sent; 
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    
+    onButtonClick(customId, callback) {
+        this.client.on('interactionCreate', async (interaction) => {
+            if (!interaction.isButton()) return;
+            if (interaction.customId !== customId) return;
+            
+            callback(interaction);
+        });
+    }
+    
+    onAnyButtonClick(callback) {
+        this.client.on('interactionCreate', async (interaction) => {
+            if (!interaction.isButton()) return;
+            callback(interaction);
+        });
+    }
+
+    
 
     
     async createChannel(guildId, name, type = 0, options = {}) {

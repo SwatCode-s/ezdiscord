@@ -31,6 +31,10 @@ It’s perfect for developers who want a **clean and modular API** for building 
 - Status & activity
 - Error handling built-in
 
+- Buttons
+  - Send buttons with embeds
+  - Handle button clicks
+
 ---
 
 ## ⚡ Installation
@@ -491,6 +495,184 @@ bot.commandWithPrefix("kick", async (msg) => {
 ```
 
 
+Button Example:
+```javascript
+
+bot.command("ping", async (msg) => {
+    const button = bot.createButton("Pong! 🏓", "ping_btn", "Primary", "🏓");
+    const row = bot.createButtonRow([button]);
+    await bot.replyWithButtons(msg, "Click the button:", [row]);
+});
+
+bot.onButtonClick("ping_btn", async (interaction) => {
+    await interaction.reply({ content: "Pong! 🏓", ephemeral: true });
+});
+
+
+```
+
+Multiple buttons With Embed example:
+```javascript
+
+bot.commandWithPrefix("support", async (msg) => {
+    
+    const embed = bot.createEmbed({
+        title: "🎫 System Support",
+        description: "How can we help you?",
+        color: 0x00ff00
+    });
+
+    
+    const techButton = bot.createButton("💻 Technical", "support_tech", "Primary", "💻");
+    const reportButton = bot.createButton("⚠️ Report", "support_report", "Danger", "⚠️");
+    const suggestionButton = bot.createButton("💡 Suggestion", "support_suggestion", "Success", "💡");
+    const otherButton = bot.createButton("❓ Other", "support_other", "Secondary", "❓");
+
+    const row = bot.createButtonRow([techButton, reportButton, suggestionButton, otherButton]);
+
+    
+    await bot.sendEmbedWithButtons(msg.channel.id, embed, [row], "Embed with buttons");
+});
+
+bot.onButtonClick("support_tech", async (interaction) => {
+    await interaction.reply({ content: "Tech support", ephemeral: true });
+});
+
+bot.onButtonClick("support_report", async (interaction) => {
+    await interaction.reply({ content: "Report support", ephemeral: true });
+});
+
+bot.onButtonClick("support_suggestion", async (interaction) => {
+    await interaction.reply({ content: "Suggestion support", ephemeral: true });
+});
+
+bot.onButtonClick("support_other", async (interaction) => {
+    await interaction.reply({ content: "Other support", ephemeral: true });
+});
+
+
+
+
+```
+
+
+## Big Example
+
+```javascript
+
+const EzDiscord = require("ezdiscord")
+
+const bot = new EzDiscord("BOT TOKEN");
+bot.setPrefix("!");
+bot.handleErrors();
+bot.login();
+
+
+
+bot.ready(async () => {
+    console.log(`${bot.client.user.tag} is online!`)
+    bot.setPresence({
+        status: "online",
+        activity: {
+            name: "with ezdiscord",
+            type: "PLAYING"
+        }
+    })
+
+});
+
+
+bot.commandWithPrefix("ticket", async (msg) => {
+    
+    const embed = bot.createEmbed({
+        title: "🎫 Ticket System",
+        description: "Please click the button to open a ticket",
+        color: 0x00ff00,
+        thumbnail: { url: msg.guild.iconURL({ dynamic: true, size: 1024 }) }
+    });
+
+    
+    const techButton = bot.createButton("Open ticket","ticket", "Primary", "🎫");
+   
+    const row = bot.createButtonRow([techButton]);
+
+    
+    await bot.sendEmbedWithButtons(msg.channel.id, embed, [row], "");
+});
+
+
+bot.onButtonClick("ticket", async (interaction) => {
+    let supportrole = await interaction.guild.roles.fetch("1403378649243062452");
+    const channel = await bot.createChannel(
+        interaction.guild.id,
+        `ticket-${interaction.user.username}`,
+
+        0, 
+        {
+            parent: "1403448330427826176",
+            permissionOverwrites: [
+                {
+                    id: interaction.guild.roles.everyone,
+                    deny: ["ViewChannel"],   
+                },
+                {
+                    id: interaction.user.id,
+                    allow: ["ViewChannel", "SendMessages"], 
+                },
+                {
+                    id: supportrole.id,
+                    allow: ["ViewChannel", "SendMessages"], 
+                },
+
+            ],
+            topic: "Ticket System",
+
+        }
+    );
+
+    await interaction.reply({ content:`Ticket created <#${channel.id}>`, ephemeral: true })
+
+
+
+    const embed = bot.createEmbed({
+        title: "🎫 New ticket",
+        description: "Please wait for support",
+        color: 0x00ff00,
+        thumbnail: { url: interaction.guild.iconURL({ dynamic: true, size: 1024 }) }
+    });
+
+    const closeButton = bot.createButton("Close", "close", "Primary", "🔒");
+    const deleteButton = bot.createButton("Delete", "Delete", "Danger", "❌");   
+
+    const row = bot.createButtonRow([closeButton, deleteButton]);
+
+
+    await bot.sendEmbedWithButtons(channel.id, embed, [row], `<@${interaction.user.id}>`);
+});
+bot.onButtonClick("close", async (interaction) => {
+    await bot.editChannelPermissions(interaction.channel.id, [
+        {
+            id: interaction.guild.roles.everyone, 
+            deny: ["ViewChannel"], 
+
+
+        },
+        {
+            id: "1403378649243062452",
+            allow: ["ViewChannel", "SendMessages"], 
+        }
+    ]);
+
+    await interaction.reply({ content: "Ticket closed 🚫", ephemeral: true });
+});
+
+bot.onButtonClick("Delete", async (interaction) => {
+    await bot.deleteChannel(interaction.channel.id);
+});
+
+
+```
+
 ## 📦 Utilities
 
 - Mention user:
@@ -516,6 +698,75 @@ bot.sendEmbed(channelId, embedOptions); // send embed
 - Bulk delete:
 ```javascript
 bot.bulkDelete(channelId, amount); // bulk delete messages
+```
+
+- Create channel:
+```javascript
+bot.createChannel(guildId, name, type, parent, permissionOverwrites); // create channel
+```
+
+- Edit channel permissions:
+```javascript
+bot.editChannelPermissions(channelId, permissionOverwrites); // edit channel permissions
+```
+
+- Delete channel:
+```javascript
+bot.deleteChannel(channelId); // delete channel
+```
+
+- Set presence:
+```javascript
+bot.setPresence({
+    status: "online",
+    activity: {
+        name: "with ezdiscord",
+        type: "PLAYING"
+    }
+});
+```
+
+- createEmbed:
+```javascript
+bot.createEmbed({
+    title: "Title",
+    description: "Description",
+    color: 0x00ff00,
+    thumbnail: { url: "https://example.com/image.png" }
+});// for buttons
+```
+
+- createButton:
+```javascript
+bot.createButton(label, customId, style, emoji); // create button
+```
+
+- createButtonRow:
+```javascript
+bot.createButtonRow([button1, button2]); // create button row
+```
+
+- sendEmbedWithButtons:
+```javascript
+bot.sendEmbedWithButtons(channelId, embed, buttonRows, text); // send embed with buttons
+```
+
+- replyWithButtons:
+```javascript
+bot.replyWithButtons(msg, text, buttonRows); // reply with buttons
+```
+
+- onButtonClick:
+```javascript
+bot.onButtonClick(customId, callback); // handle button clicks
+```
+
+
+
+
+- requiredPermission:
+```javascript
+bot.requiredPermission(msg, permission); // check if user has permission
 ```
 
 

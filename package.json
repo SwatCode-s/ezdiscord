@@ -1,6 +1,6 @@
 {
   "name": "ezdiscord",
-  "version": "1.0.6",
+  "version": "1.0.11",
   "description": "A simple discord bot library for making Discord.js  easily",
   "license": "MIT",
   "author": "MhmdPluxury",
@@ -33,12 +33,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/MhmdPluxury/ezdiscord.git"
+    "url": "https://github.com/SwatCode-s/ezdiscord.git"
   },
   "bugs": {
-    "url": "https://github.com/MhmdPluxury/ezdiscord/issues"
+    "url": "https://github.com/SwatCode-s/ezdiscord/issues"
   },
-  "homepage": "https://github.com/MhmdPluxury/ezdiscord",
+  "homepage": "https://github.com/SwatCode-s/ezdiscord",
   "files": [
     "index.js",
     "README.md",
