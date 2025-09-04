@@ -1,0 +1,51 @@
+{
+  "name": "ezdiscord",
+  "version": "1.0.6",
+  "description": "A simple discord bot library for making Discord.js  easily",
+  "license": "MIT",
+  "author": "MhmdPluxury",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "discord",
+    "discord.js",
+    "discord bot",
+    "discord bot library",
+    "discord bot framework",
+    "discord bot framework library",
+    "discord bot framework library for discord.js",
+    "discord bot framework library for discord.js v14",
+    "discord bot framework library for discord.js v14.22.1",
+    "discord bot framework library for discord.js v14.22.1 with ezdiscord",
+    "discord bot framework library for discord.js v14.22.1 with ezdiscord v1.0.5",
+    "discord bot framework library for discord.js v14.22.1 with ezdiscord v1.0.5 and discord.js v14.22.1",
+    "mhmdpluxury",
+    "ezdiscord",
+    "ezdiscord.js",
+    "ezdiscord.js v1.0.5",
+    "discord.js v14.22.1",
+    "discord.js v14.22.1 with ezdiscord",
+    "discord.js v14.22.1 with ezdiscord v1.0.5",
+    "discord.js v14.22.1 with ezdiscord v1.0.5 and discord.js v14.22.1"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MhmdPluxury/ezdiscord.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MhmdPluxury/ezdiscord/issues"
+  },
+  "homepage": "https://github.com/MhmdPluxury/ezdiscord",
+  "files": [
+    "index.js",
+    "README.md",
+    "package.json",
+    "package-lock.json"
+  ],
+  "dependencies": {
+    "discord.js": "^14.22.1"
+  }
+}
