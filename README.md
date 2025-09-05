@@ -555,6 +555,89 @@ bot.onButtonClick("support_other", async (interaction) => {
 
 ```
 
+## Slash commands example
+
+```javascript
+
+const EzDiscord = require("ezdiscord")
+
+const bot = new EzDiscord("BOT TOKEN");
+bot.setPrefix("!");
+bot.handleErrors();
+bot.login();
+
+
+bot.ready(async () => {
+    console.log(`${bot.client.user.tag} is online!`);
+    
+    await bot.registerSlashCommands(bot.client.user.id);
+});
+
+
+
+
+bot.CreateSlashCommand("ping", "ping", [
+    {
+        description: "ping",
+    }
+
+]);
+
+bot.CreateSlashCommand("user", "get user info", [
+    {
+        name: "user",
+        description: "get user info",
+        type: "user",
+        required: true,
+    },
+]);
+
+bot.CreateSlashCommand("channel", "send a message", [
+    {
+        name: "channel",
+        description: "send a message",
+        type: "channel",
+        required: true,
+    },
+    {
+        name: "message",
+        description: "the message to send",
+        type: "string",
+        required: true,
+    }
+]);
+
+bot.onSlashCommand("ping", async (interaction) => {
+    await interaction.reply({ content: "pong!", ephemeral: true });
+});
+
+bot.onSlashCommand("user", async (interaction) => {
+    const user = interaction.options.getUser("user");
+    let member = await bot.getMember(interaction.guildId, user.id)
+    bot.sendEmbed(interaction.channelId, {
+        title: `Profile of ${user.username}`,
+        color: 0x00ff00,
+        thumbnail: { url: user.displayAvatarURL({dynamic: true}) },
+        fields: [
+            { name: "Name", value: user.tag, inline: true },
+            { name: "ID", value: user.id, inline: true },
+            { name: "Joined at", value: member.joinedAt.toDateString(), inline: true },
+            { name: "Roles", value: member.roles.cache.map(r => r.name).join(", ") || "No roles" }
+        ]
+    });
+
+});
+
+bot.onSlashCommand("channel", async (interaction) => {
+    const channel = interaction.options.getChannel("channel");
+    const message = interaction.options.getString("message");
+    channel.send(message);
+});
+
+
+
+```
+
 
 ## Big Example
 
@@ -769,6 +852,22 @@ bot.onButtonClick(customId, callback); // handle button clicks
 bot.requiredPermission(msg, permission); // check if user has permission
 ```
 
+- createSlashCommand:
+```javascript
+bot.createSlashCommand(name, description, options); // create slash command
+```
+
+- onSlashCommand:
+```javascript
+bot.onSlashCommand(name, callback); // handle slash commands
+```
+
+- registerSlashCommands:
+```javascript
+bot.registerSlashCommands(); // register slash commands (only once on ready event)
+```
+
+
 
 
 ## 💡 Notes
@@ -780,3 +879,4 @@ Supports Vanity URLs for invite tracking.
 Fully compatible with Discord.js v14.
 
 contact me: mhmdpluxury
+
