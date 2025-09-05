@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField,ActionRowBuilder, ButtonBuilder, ButtonStyle  } = require("discord.js");
+const { Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField,ActionRowBuilder, ButtonBuilder, ButtonStyle,  SlashCommandBuilder, REST, Routes  } = require("discord.js");
 
 class EzDiscord {
     constructor(token) {
@@ -20,19 +20,34 @@ class EzDiscord {
         this.invites = new Map(); 
 this.lastInviter = null; 
 
+this.slashCommands = [];
+    this.slashCommandHandlers = new Map();
+
+
     }
 
     
     login() {
         return this.client.login(this.token);
     }
-
     ready(callback) {
         this.client.once("ready", async () => {
-            await this.loadInvites(); 
+            await this.loadInvites();
+            
+            
+            this.client.on('interactionCreate', async (interaction) => {
+                if (!interaction.isChatInputCommand()) return;
+                
+                const handler = this.slashCommandHandlers.get(interaction.commandName);
+                if (handler) {
+                    await handler(interaction);
+                }
+            });
+            
             callback();
         });
     }
+
 
     
     on(event, callback) {
@@ -341,6 +356,76 @@ async inviteBy(member) {
             callback(interaction);
         });
     }
+
+CreateSlashCommand(commandName, commandDescription, commandOptions = []) {
+    const command = new SlashCommandBuilder()
+        .setName(commandName)
+        .setDescription(commandDescription);
+
+    
+    commandOptions.forEach(option => {
+        switch(option.type) {
+            case 'string':
+                command.addStringOption(opt => 
+                    opt.setName(option.name)
+                       .setDescription(option.description)
+                       .setRequired(option.required || false)
+                );
+                break;
+            case 'user':
+                command.addUserOption(opt => 
+                    opt.setName(option.name)
+                       .setDescription(option.description)
+                       .setRequired(option.required || false)
+                );
+                break;
+            case 'channel':
+                command.addChannelOption(opt => 
+                    opt.setName(option.name)
+                       .setDescription(option.description)
+                       .setRequired(option.required || false)
+                );
+                break;
+        }
+    });
+
+    this.slashCommands.push(command.toJSON());
+    return command;
+}
+
+
+onSlashCommand(commandName, callback) {
+    this.slashCommandHandlers.set(commandName, callback);
+}
+
+
+
+async registerSlashCommands(clientId, guildId = null) {
+    const rest = new REST({ version: '10' }).setToken(this.token);
+
+    try {
+        console.log('Started refreshing slash commands...');
+        
+        if (guildId) {
+            
+            await rest.put(
+                Routes.applicationGuildCommands(clientId, guildId),
+                { body: this.slashCommands }
+            );
+        } else {
+            
+            await rest.put(
+                Routes.applicationCommands(clientId),
+                { body: this.slashCommands }
+            );
+        }
+
+        console.log('Successfully reloaded slash commands.');
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 
     
 

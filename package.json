@@ -1,6 +1,6 @@
 {
   "name": "ezdiscord",
-  "version": "1.0.11",
+  "version": "1.0.13",
   "description": "A simple discord bot library for making Discord.js  easily",
   "license": "MIT",
   "author": "MhmdPluxury",
@@ -29,7 +29,10 @@
     "discord.js v14.22.1",
     "discord.js v14.22.1 with ezdiscord",
     "discord.js v14.22.1 with ezdiscord v1.0.5",
-    "discord.js v14.22.1 with ezdiscord v1.0.5 and discord.js v14.22.1"
+    "discord.js v14.22.1 with ezdiscord v1.0.5 and discord.js v14.22.1",
+    "Discord.js",
+    "Pluxury",
+    "Discord"
   ],
   "repository": {
     "type": "git",
