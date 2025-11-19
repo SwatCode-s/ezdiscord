@@ -1,6 +1,5 @@
 {
   "name": "Suggestions Bot",
-  "prefix": "!",
   "commands": [
     {
       "name": "/help",
