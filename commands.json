@@ -1,0 +1,32 @@
+{
+  "name": "Suggestions Bot",
+  "prefix": "!",
+  "commands": [
+    {
+      "name": "/help",
+      "alias": "/help",
+      "slash": true,
+      "type": "embed",
+      "fields": [
+        { "name": "🛠️ /setchannel", "value": "تعيين قناة الاقتراحات." },
+        { "name": "💬 /reply", "value": "الرد على الاقتراحات." }
+      ],
+      "embedConfig": {
+        "title": "📋 قائمة الأوامر المتاحة",
+        "description": "الأوامر المدعومة:",
+        "color": "#5865F2",
+        "thumbnail": "[serverimg]"
+      }
+    },
+    {
+      "name": "/setchannel",
+      "alias": "/setchannel",
+      "slash": true,
+      "type": "text",
+      "responses": {
+        "setchannel": "تم تعيين القناة!",
+        "nopermissions": "صلاحيات ناقصة"
+      }
+    }
+  ]
+}
